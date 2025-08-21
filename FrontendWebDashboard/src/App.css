@@ -58,6 +58,31 @@
   transition: color 0.3s ease;
 }
 
+/* Generic button style reused across app */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--button-bg, #007bff);
+  color: var(--button-text, #fff);
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
 .theme-toggle {
   position: absolute;
   top: 20px;
