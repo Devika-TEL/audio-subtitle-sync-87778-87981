@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import FileDropzone from "../components/FileDropzone";
 import Toast from "../components/Toast";
-import { apiPostForm } from "../api/client";
+import { apiPostForm, apiGet } from "../api/client";
 
 /**
  * UploadPage
@@ -18,6 +18,19 @@ export default function UploadPage() {
   const [busy, setBusy] = useState(false);
   const [lastMode, setLastMode] = useState(null);
   const navigate = useNavigate();
+
+  // PUBLIC_INTERFACE
+  // Test connectivity with backend /api/hello endpoint and show result in a toast.
+  const testBackend = async () => {
+    try {
+      const res = await apiGet("/api/hello");
+      // Expecting a JSON like { message: "..." } or a string
+      const msg = typeof res === "string" ? res : res?.message || "OK";
+      setMessage(`Backend says: ${msg}`);
+    } catch (e) {
+      setMessage(`Error contacting backend: ${e.message}`);
+    }
+  };
 
   const onVideoFiles = (files) => {
     const vid = files.find(
@@ -91,6 +104,15 @@ export default function UploadPage() {
             onClick={() => submit("reposition")}
           >
             🔀 Reposition via Burnt-in Detection
+          </button>
+          <button
+            className="btn"
+            aria-label="Test Backend connectivity"
+            onClick={testBackend}
+            disabled={busy}
+            title="Calls /api/hello on the backend and displays the response."
+          >
+            🧪 Test Backend
           </button>
         </div>
       }
