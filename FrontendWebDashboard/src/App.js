@@ -4,10 +4,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import UploadPage from "./pages/UploadPage";
-import JobsPage from "./pages/JobsPage";
-import ManageSubtitlesPage from "./pages/ManageSubtitlesPage";
-import TranslatePage from "./pages/TranslatePage";
-import AdminPage from "./pages/AdminPage";
+import PreviewPage from "./pages/PreviewPage";
 
 // PUBLIC_INTERFACE
 function App() {
@@ -41,10 +38,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/upload" element={<UploadPage />} />
-            <Route path="/jobs" element={<JobsPage />} />
-            <Route path="/manage" element={<ManageSubtitlesPage />} />
-            <Route path="/translate" element={<TranslatePage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/preview/:sessionId" element={<PreviewPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

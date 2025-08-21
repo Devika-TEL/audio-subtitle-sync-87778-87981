@@ -1,11 +1,12 @@
-# Audio-Subtitle Sync Frontend Dashboard (React)
+# Subtitle QC & Repositioning Frontend (React)
 
-A responsive, accessible dashboard that lets users:
-- Upload videos and optional subtitle files
-- Monitor processing jobs
-- Manage, edit, and download subtitles
-- Request translations
-- Access admin metrics and logs
+A focused, accessible UI for:
+- Uploading a video and optional subtitle file to run a Subtitle Quality Check
+- Requesting subtitle repositioning based on burnt-in (hardcoded) text detection
+- Previewing video playback with overlaid subtitles and visualization of detected burnt-in regions
+- Downloading corrected/repositioned subtitle output
+
+All unrelated features (translations, general subtitle management, admin, notifications, and jobs listing) have been removed.
 
 ## Environment Variables
 
@@ -24,11 +25,8 @@ The orchestrator will set these in CI/CD environments. Do not hard-code API URLs
 ## Routes
 
 - `/` - Home
-- `/upload` - Upload video/subtitles
-- `/jobs` - Monitor jobs
-- `/manage` - Manage and edit subtitles
-- `/translate` - Request translations
-- `/admin` - Admin dashboard
+- `/upload` - Upload video/subtitles and start QC or Repositioning
+- `/preview/:sessionId` - Preview video with subtitle overlay and burnt-in detection visualization
 
 ## Accessibility and Responsiveness
 
@@ -39,11 +37,8 @@ The orchestrator will set these in CI/CD environments. Do not hard-code API URLs
 ## Notes
 
 This frontend expects the backend to expose:
-- `POST /upload` - multipart with `video`, optional `subtitle`, `mode`
-- `GET /jobs` - list of jobs with progress, status, and `download_path`
-- `GET /subtitles` - list of available subtitle items
-- `GET /subtitles/{id}` - return editable cues
-- `POST /subtitles/{id}` - save edited cues
-- `GET /subtitles/{id}/download` - download subtitle file
-- `POST /subtitles/{id}/translate` - request translation targets
-- `GET /admin/metrics` and `GET /admin/logs` - admin info
+- `POST /upload` - multipart with `video`, optional `subtitle`, `mode` where mode is `quality_check` or `reposition`
+- `GET /preview/:sessionId` - returns metadata to stream or access a processed session's assets
+- `GET /sessions/:sessionId/detections` - list of burnt-in text detections (time ranges and bounding boxes per frame/segment)
+- `GET /sessions/:sessionId/subtitles` - returns updated cues for preview overlay
+- `GET /sessions/:sessionId/download` - download corrected/repositioned subtitle file
