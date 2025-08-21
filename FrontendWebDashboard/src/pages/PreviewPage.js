@@ -82,16 +82,16 @@ export default function PreviewPage() {
 
   // Determine current detections (show any detection intersecting current time)
   const currentBoxes = useMemo(() => {
-    if (!videoRef.current) return [];
-    const t = videoRef.current.currentTime || 0;
+    const video = videoRef.current;
+    if (!video) return [];
+    const t = video.currentTime || 0;
     const list = detections.filter((d) => {
       const start = typeof d.start === "number" ? d.start : parseTime(d.start);
       const end = typeof d.end === "number" ? d.end : parseTime(d.end);
       return t >= start && t <= end;
     });
-    // Flatten boxes
     return list.flatMap((d) => d.boxes || []);
-  }, [detections]);
+  }, [detections, parseTime]);
 
   const onDownload = async () => {
     try {

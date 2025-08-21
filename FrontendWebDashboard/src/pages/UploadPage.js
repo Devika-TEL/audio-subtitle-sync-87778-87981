@@ -5,15 +5,24 @@ import FileDropzone from "../components/FileDropzone";
 import Toast from "../components/Toast";
 import { apiPostForm } from "../api/client";
 
+/**
+ * UploadPage
+ * Allows selecting a video and optional subtitle file then triggers backend processing
+ * via /upload with mode = "quality_check" or "reposition".
+ * On success, navigates to preview page to see overlays and updated cues.
+ */
 export default function UploadPage() {
   const [videoFile, setVideoFile] = useState(null);
   const [subtitleFile, setSubtitleFile] = useState(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [lastMode, setLastMode] = useState(null);
   const navigate = useNavigate();
 
   const onVideoFiles = (files) => {
-    const vid = files.find((f) => f.type.startsWith("video/") || /\.(mp4|mkv|mov|avi)$/i.test(f.name));
+    const vid = files.find(
+      (f) => f.type.startsWith("video/") || /\.(mp4|mkv|mov|avi|webm)$/i.test(f.name)
+    );
     setVideoFile(vid || null);
   };
 
@@ -32,17 +41,26 @@ export default function UploadPage() {
       return;
     }
     setBusy(true);
+    setLastMode(mode);
     try {
       const fd = new FormData();
-      fd.append("video", videoFile);
-      if (subtitleFile) fd.append("subtitle", subtitleFile);
+      fd.append("video", videoFile, videoFile.name);
+      if (subtitleFile) fd.append("subtitle", subtitleFile, subtitleFile.name);
       fd.append("mode", mode); // "quality_check" or "reposition"
+
+      // PUBLIC_INTERFACE
+      // The /upload endpoint is expected to return { id, sessionId?, status }
       const resp = await apiPostForm("/upload", fd);
-      // Expect { id, sessionId?, status }
-      const sessionId = resp.sessionId || resp.id;
-      setMessage("Upload successful. Processing started.");
+      const sessionId = resp?.sessionId || resp?.id;
+      if (!sessionId) {
+        throw new Error("No sessionId returned from server.");
+      }
+      setMessage(
+        `Upload successful. ${mode === "reposition" ? "Repositioning" : "Quality check"} job started.`
+      );
+
       // Navigate to preview page for this session
-      if (sessionId) navigate(`/preview/${encodeURIComponent(sessionId)}`);
+      navigate(`/preview/${encodeURIComponent(sessionId)}`);
       setSubtitleFile(null);
       setVideoFile(null);
     } catch (e) {
@@ -58,10 +76,20 @@ export default function UploadPage() {
       description="Upload a video and optional subtitle file to run quality checks or reposition captions away from burnt-in text."
       actions={
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button className="btn" disabled={!videoFile || busy} onClick={() => submit("quality_check")}>
+          <button
+            className="btn"
+            aria-label="Start Quality Check"
+            disabled={!videoFile || busy}
+            onClick={() => submit("quality_check")}
+          >
             ✅ Start Quality Check
           </button>
-          <button className="btn" disabled={!videoFile || busy} onClick={() => submit("reposition")}>
+          <button
+            className="btn"
+            aria-label="Start Repositioning"
+            disabled={!videoFile || busy}
+            onClick={() => submit("reposition")}
+          >
             🔀 Reposition via Burnt-in Detection
           </button>
         </div>
@@ -69,17 +97,42 @@ export default function UploadPage() {
     >
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
         <div>
-          <h2>Video</h2>
-          <FileDropzone label="Drop a video file here or click to select" onFiles={onVideoFiles} accept="video/*,.mp4,.mov,.mkv,.avi" />
-          {videoFile ? <p>Selected: {videoFile.name}</p> : <p>No video selected.</p>}
+          <h2 style={{ marginBottom: 8 }}>Video</h2>
+          <FileDropzone
+            label="Drop a video file here or click to select"
+            onFiles={onVideoFiles}
+            accept="video/*,.mp4,.mov,.mkv,.avi,.webm"
+          />
+          {videoFile ? (
+            <p aria-live="polite">Selected: {videoFile.name}</p>
+          ) : (
+            <p aria-live="polite">No video selected.</p>
+          )}
         </div>
         <div>
-          <h2>Subtitle (optional)</h2>
-          <FileDropzone label="Drop a subtitle file here or click to select" onFiles={onSubtitleFiles} accept=".srt,.vtt,.ass,.ssa,.dfxp,.ttml,.sbv" />
-          {subtitleFile ? <p>Selected: {subtitleFile.name}</p> : <p>No subtitle selected.</p>}
+          <h2 style={{ marginBottom: 8 }}>Subtitle (optional)</h2>
+          <FileDropzone
+            label="Drop a subtitle file here or click to select"
+            onFiles={onSubtitleFiles}
+            accept=".srt,.vtt,.ass,.ssa,.dfxp,.ttml,.sbv"
+          />
+          {subtitleFile ? (
+            <p aria-live="polite">Selected: {subtitleFile.name}</p>
+          ) : (
+            <p aria-live="polite">No subtitle selected.</p>
+          )}
         </div>
       </div>
-      <Toast message={message} onClose={() => setMessage("")} type={message.startsWith("Error") ? "error" : "info"} />
+      <div style={{ marginTop: 8, color: "gray", fontSize: 14 }}>
+        {busy
+          ? `Uploading and starting ${lastMode || "job"}…`
+          : "Choose a mode to start processing after selecting your files."}
+      </div>
+      <Toast
+        message={message}
+        onClose={() => setMessage("")}
+        type={message.startsWith("Error") ? "error" : "info"}
+      />
     </Container>
   );
 }

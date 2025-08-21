@@ -25,8 +25,8 @@ The orchestrator will set these in CI/CD environments. Do not hard-code API URLs
 ## Routes (only essentials)
 
 - `/` - Home
-- `/upload` - Upload video/subtitles and start QC or Repositioning
-- `/preview/:sessionId` - Preview video with subtitle overlay and burnt-in detection visualization
+- `/upload` - Upload video/subtitles and start QC or Repositioning (invokes POST /upload)
+- `/preview/:sessionId` - Preview video with subtitle overlay and burnt-in detection visualization; polls preview metadata, detections, and updated cues
 
 ## Accessibility and Responsiveness
 
