@@ -1,12 +1,12 @@
 # Subtitle QC & Repositioning Frontend (React)
 
-A focused, accessible UI for:
+A streamlined, accessible UI focused only on:
 - Uploading a video and optional subtitle file to run a Subtitle Quality Check
 - Requesting subtitle repositioning based on burnt-in (hardcoded) text detection
 - Previewing video playback with overlaid subtitles and visualization of detected burnt-in regions
 - Downloading corrected/repositioned subtitle output
 
-All unrelated features (translations, general subtitle management, admin, notifications, and jobs listing) have been removed.
+All unrelated features (translations, general subtitle management, admin, notifications, jobs listing, themes, or other non-essential UI) have been removed.
 
 ## Environment Variables
 
@@ -22,7 +22,7 @@ The orchestrator will set these in CI/CD environments. Do not hard-code API URLs
 - `npm test` - run tests
 - `npm run build` - build for production
 
-## Routes
+## Routes (only essentials)
 
 - `/` - Home
 - `/upload` - Upload video/subtitles and start QC or Repositioning
@@ -34,7 +34,7 @@ The orchestrator will set these in CI/CD environments. Do not hard-code API URLs
 - ARIA roles and labels for assistive tech
 - Fluid layout with responsive components
 
-## Notes
+## Backend API expectations
 
 This frontend expects the backend to expose:
 - `POST /upload` - multipart with `video`, optional `subtitle`, `mode` where mode is `quality_check` or `reposition`

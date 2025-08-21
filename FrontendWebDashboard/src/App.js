@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
@@ -8,30 +8,11 @@ import PreviewPage from "./pages/PreviewPage";
 
 // PUBLIC_INTERFACE
 function App() {
-  /** Root app component setting up routing, theme toggling, and layout. */
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  // PUBLIC_INTERFACE
-  const toggleTheme = () => {
-    /** Toggle light/dark theme and apply to document element. */
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
+  /** Root app component setting up routing and minimal layout for QC/Repositioning only. */
   return (
     <BrowserRouter>
       <div className="App">
-        <header className="App-header" style={{ minHeight: "auto", paddingBottom: 40 }}>
-          <button
-            className="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-          >
-            {theme === "light" ? "🌙 Dark" : "☀️ Light"}
-          </button>
+        <header className="App-header" style={{ minHeight: "auto", paddingBottom: 16 }}>
           <Navbar />
         </header>
         <main style={{ paddingTop: 12, paddingBottom: 40 }}>
